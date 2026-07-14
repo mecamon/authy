@@ -10,6 +10,7 @@ import (
 func TestGenerateHashFromStr(t *testing.T) {
 	v := "some-test-value-to-hash"
 	hashedValue, err := GenerateHashFromStr(v)
+
 	assert.NoError(t, err)
 	assert.NotEqual(t, v, hashedValue)
 }
@@ -60,6 +61,7 @@ func TestComparePasswordAndHash(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			result, compareErr := ComparePasswordAndHash(tt.input, tt.hash)
+
 			assert.Equal(t, compareErr, tt.err)
 			assert.Equal(t, tt.expectedOutput, result)
 		})

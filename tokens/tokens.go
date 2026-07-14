@@ -7,7 +7,6 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
-	"fmt"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -95,7 +94,7 @@ func (t *TokenServ) issueSignedJWT(claims jwt.MapClaims) (string, error) {
 
 // ValidateAccessCustom checks a signed JWT string to see if complys with the token type, the secret key, if it is already expired
 // or if it has been altered. This is meant to be used to validate any token issued by IssueAccess or IssueAccessCustom.
-func (t *TokenServ) ValidateAccessCustom(signed string, tokenType string) (jwt.MapClaims, error) {
+func (t *TokenServ) ValidateAccessCustom(signed string) (jwt.MapClaims, error) {
 	N := t.privKeyRSA.PublicKey.N
 	E := t.privKeyRSA.PublicKey.E
 
@@ -107,18 +106,15 @@ func (t *TokenServ) ValidateAccessCustom(signed string, tokenType string) (jwt.M
 	})
 
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrInvalidToken, err)
+		return nil, errors.Join(ErrInvalidToken, err)
 	}
 
-	if claims, ok := parsed.Claims.(jwt.MapClaims); ok && parsed.Valid {
-		if claims["type"] != tokenType {
-			return nil, ErrWrongTokenType
-		}
-
-		return claims, nil
-	} else {
+	claims, ok := parsed.Claims.(jwt.MapClaims)
+	if !parsed.Valid || !ok {
 		return nil, ErrParseClaims
 	}
+
+	return claims, nil
 }
 
 // generateClaims returns opaque claims to be used as access tokens.

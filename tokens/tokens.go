@@ -77,7 +77,7 @@ func (t *TokenServ) HashRawToken(raw string) string {
 
 // IssueAccessCustom generates an Access Token (JWT) with a fixed base claims and optional extra claims.
 // Bear in mind that if any key has the same name as any of the properties in the base claims, this will be overwritten.
-func (t *TokenServ) IssueAccessCustom(base BaseClaims, extra ...map[string]any) (string, error) {
+func (t *TokenServ) IssueOpaque(base BaseClaims, extra ...map[string]any) (string, error) {
 	claims := t.generateClaims(base, extra...)
 
 	return t.issueSignedJWT(claims)
@@ -94,7 +94,7 @@ func (t *TokenServ) issueSignedJWT(claims jwt.MapClaims) (string, error) {
 
 // ValidateAccessCustom checks a signed JWT string to see if complys with the token type, the secret key, if it is already expired
 // or if it has been altered. This is meant to be used to validate any token issued by IssueAccess or IssueAccessCustom.
-func (t *TokenServ) ValidateAccessCustom(signed string) (jwt.MapClaims, error) {
+func (t *TokenServ) ValidateOpaque(signed string) (jwt.MapClaims, error) {
 	N := t.privKeyRSA.PublicKey.N
 	E := t.privKeyRSA.PublicKey.E
 

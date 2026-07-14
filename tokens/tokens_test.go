@@ -83,10 +83,10 @@ func TestTokensServ_IssueAccessCustom(t *testing.T) {
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			strToken, err := to.IssueAccessCustom(tt.base, tt.extra)
+			strToken, err := to.IssueOpaque(tt.base, tt.extra)
 			require.NoError(t, err)
 
-			claims, err := to.ValidateAccessCustom(strToken)
+			claims, err := to.ValidateOpaque(strToken)
 			if err != nil {
 				assert.ErrorIs(t, err, tt.err)
 				return

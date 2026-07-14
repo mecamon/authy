@@ -36,15 +36,15 @@ type params struct {
 // hash base64 encoded, salt base64 encoded and all the involved params to generate the hash.
 // This is an example output:
 // $argon2id$v=19$m=65536,t=3,p=2$Woo1mErn1s7AHf96ewQ8Uw$D4TzIwGO4XD2buk96qAP+Ed2baMo/KbTRMqXX00wtsU
-func GenerateHashFromStr(password string) (encodedHash string, err error) {
+func GenerateHashFromRaw(raw string) (encodedHash string, err error) {
 	salt, err := generateRandomBytes(saltLength)
 	if err != nil {
 		return "", err
 	}
 
-	hash := argon2.IDKey([]byte(password), salt, iterations, memory, parallelism, keyLength)
+	hash := argon2.IDKey([]byte(raw), salt, iterations, memory, parallelism, keyLength)
 
-	// Base64 encode the salt and hashed password.
+	// Base64 encode the salt and hashed raw.
 	b64Salt := base64.RawStdEncoding.EncodeToString(salt)
 	b64Hash := base64.RawStdEncoding.EncodeToString(hash)
 
@@ -57,7 +57,7 @@ func GenerateHashFromStr(password string) (encodedHash string, err error) {
 	// pos[2] represents the version of argon2
 	// pos[3] represents the memory(m), iteration(t), parallelism(p)
 	// post[4] represents the salt base64 encoded
-	// pos[5] represents the hashed password base64 encoded
+	// pos[5] represents the hashed raw base64 encoded
 	encodedHash = fmt.Sprintf("$argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s", argon2.Version, memory, iterations, parallelism, b64Salt, b64Hash)
 
 	return encodedHash, nil
@@ -73,18 +73,18 @@ func generateRandomBytes(n uint32) ([]byte, error) {
 	return b, nil
 }
 
-func ComparePasswordAndHash(password, encodedHash string) (match bool, err error) {
-	// Extract the parameters, salt and derived key from the encoded password
+func CompareRawAndHash(raw, encodedHash string) (match bool, err error) {
+	// Extract the parameters, salt and derived key from the encoded raw string
 	// hash.
 	p, salt, hash, err := decodeHash(encodedHash)
 	if err != nil {
 		return false, err
 	}
 
-	// Derive the key from the other password using the same parameters.
-	otherHash := argon2.IDKey([]byte(password), salt, p.iterations, p.memory, p.parallelism, p.keyLength)
+	// Derive the key from the other raw using the same parameters.
+	otherHash := argon2.IDKey([]byte(raw), salt, p.iterations, p.memory, p.parallelism, p.keyLength)
 
-	// Check that the contents of the hashed passwords are identical. Note
+	// Check that the contents of the hashed raws are identical. Note
 	// that we are using the subtle.ConstantTimeCompare() function for this
 	// to help prevent timing attacks.
 	if subtle.ConstantTimeCompare(hash, otherHash) == 1 {

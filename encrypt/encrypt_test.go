@@ -7,9 +7,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGenerateHashFromStr(t *testing.T) {
+func TestGenerateHashFromRaw(t *testing.T) {
 	v := "some-test-value-to-hash"
-	hashedValue, err := GenerateHashFromStr(v)
+	hashedValue, err := GenerateHashFromRaw(v)
 
 	assert.NoError(t, err)
 	assert.NotEqual(t, v, hashedValue)
@@ -17,11 +17,11 @@ func TestGenerateHashFromStr(t *testing.T) {
 
 func TestComparePasswordAndHash(t *testing.T) {
 	input := "el-quijote-es-un-buen-libro"
-	hash, err := GenerateHashFromStr(input)
+	hash, err := GenerateHashFromRaw(input)
 	require.NoError(t, err)
 
 	input2 := "el-principito-$-asdasd$"
-	hash2, err := GenerateHashFromStr(input2)
+	hash2, err := GenerateHashFromRaw(input2)
 	require.NoError(t, err)
 
 	invalidHash := "$asdasdad$asdad"
@@ -60,7 +60,7 @@ func TestComparePasswordAndHash(t *testing.T) {
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			result, compareErr := ComparePasswordAndHash(tt.input, tt.hash)
+			result, compareErr := CompareRawAndHash(tt.input, tt.hash)
 
 			assert.Equal(t, compareErr, tt.err)
 			assert.Equal(t, tt.expectedOutput, result)

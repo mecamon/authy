@@ -13,9 +13,8 @@ import (
 )
 
 var (
-	ErrWrongTokenType = errors.New("wrong token subject")
-	ErrParseClaims    = errors.New("it could not parse claims")
-	ErrInvalidToken   = errors.New("invalid token")
+	ErrParseClaims  = errors.New("it could not parse claims")
+	ErrInvalidToken = errors.New("invalid token")
 )
 
 func New(privKeyRSA *rsa.PrivateKey) *TokenServ {
